@@ -38,6 +38,7 @@ export interface Place {
   transitTip: string; // e.g., '나리타공항에서 스카이라이너로 41분'
   tags: string[];
   googleMapsUrl: string;
+  wikipediaUrl?: string;
 }
 
 export interface CategoryInfo {

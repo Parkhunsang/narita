@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Place } from '../types/place';
-import { X, Star, Clock, MapPin, Copy, Check, ExternalLink, Bookmark, Sparkles, Navigation } from 'lucide-react';
+import { X, Star, Clock, MapPin, Copy, Check, ExternalLink, Bookmark, Sparkles, Navigation, BookOpen } from 'lucide-react';
 
 interface PlaceDetailModalProps {
   place: Place | null;
@@ -167,9 +167,35 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
 
           {/* Description */}
           <div>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
-              장소 소개
-            </h4>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                장소 소개
+              </h4>
+              {place.wikipediaUrl && (
+                <a
+                  href={place.wikipediaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: '#2563eb',
+                    textDecoration: 'none',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    backgroundColor: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                  }}
+                >
+                  <BookOpen size={13} />
+                  위키백과 상세 해설
+                  <ExternalLink size={11} />
+                </a>
+              )}
+            </div>
             <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.6 }}>
               {place.description}
             </p>
