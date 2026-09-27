@@ -1,12 +1,17 @@
 export type CategoryId = 
   | 'all'
-  | 'restaurant'
+  | 'my_stay'
+  | 'sushi'
+  | 'ramen'
+  | 'meat'
+  | 'izakaya'
   | 'cafe'
   | 'attraction'
   | 'shopping'
+  | 'narita_special'
   | 'transit'
-  | 'stay'
-  | 'narita_special';
+  | 'restaurant'
+  | 'stay';
 
 export type RegionId = 'all' | 'narita' | 'ueno_asakusa' | 'shinjuku_shibuya' | 'tokyo_ginza';
 
@@ -16,6 +21,7 @@ export interface Place {
   nameJa: string;
   nameEn: string;
   category: CategoryId;
+  subCategory?: string;
   region: RegionId;
   lat: number;
   lng: number;

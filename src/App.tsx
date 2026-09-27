@@ -180,7 +180,11 @@ export function App() {
 
       // 2. Category filter
       if (selectedCategory !== 'all') {
-        if (selectedCategory === 'narita_special') {
+        if (selectedCategory === 'my_stay') {
+          if (place.id !== 'narita-welco-hotel' && place.category !== 'my_stay') {
+            return false;
+          }
+        } else if (selectedCategory === 'narita_special') {
           if (place.category !== 'narita_special' && place.region !== 'narita') {
             return false;
           }
@@ -229,6 +233,9 @@ export function App() {
 
     places.forEach((p) => {
       counts[p.category] = (counts[p.category] || 0) + 1;
+      if (p.id === 'narita-welco-hotel') {
+        counts['my_stay'] = (counts['my_stay'] || 0) + 1;
+      }
       if (p.region === 'narita') {
         counts['narita_special'] = (counts['narita_special'] || 0) + 1;
       }

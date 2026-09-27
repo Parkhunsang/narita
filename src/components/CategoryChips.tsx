@@ -3,13 +3,16 @@ import { CATEGORIES } from '../data/placesData';
 import type { CategoryId } from '../types/place';
 import { 
   Compass, 
-  PlaneTakeoff, 
+  Hotel,
+  Fish,
   Utensils, 
+  Flame,
+  Beer,
   Coffee, 
   Landmark, 
   ShoppingBag, 
-  Train, 
-  Hotel 
+  PlaneTakeoff,
+  Train 
 } from 'lucide-react';
 
 interface CategoryChipsProps {
@@ -26,23 +29,29 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case 'Compass':
-        return <Compass size={16} />;
-      case 'PlaneTakeoff':
-        return <PlaneTakeoff size={16} />;
-      case 'Utensils':
-        return <Utensils size={16} />;
-      case 'Coffee':
-        return <Coffee size={16} />;
-      case 'Landmark':
-        return <Landmark size={16} />;
-      case 'ShoppingBag':
-        return <ShoppingBag size={16} />;
-      case 'Train':
-        return <Train size={16} />;
+        return <Compass size={15} />;
       case 'Hotel':
-        return <Hotel size={16} />;
+        return <Hotel size={15} />;
+      case 'Fish':
+        return <Fish size={15} />;
+      case 'Utensils':
+        return <Utensils size={15} />;
+      case 'Flame':
+        return <Flame size={15} />;
+      case 'Beer':
+        return <Beer size={15} />;
+      case 'Coffee':
+        return <Coffee size={15} />;
+      case 'Landmark':
+        return <Landmark size={15} />;
+      case 'ShoppingBag':
+        return <ShoppingBag size={15} />;
+      case 'PlaneTakeoff':
+        return <PlaneTakeoff size={15} />;
+      case 'Train':
+        return <Train size={15} />;
       default:
-        return <Compass size={16} />;
+        return <Compass size={15} />;
     }
   };
 
@@ -58,8 +67,12 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
             onClick={() => onSelectCategory(category.id)}
             className={`chip-button ${isActive ? 'active' : ''}`}
             title={`${category.label} (${count})`}
+            style={{
+              borderColor: isActive ? category.color : undefined,
+              boxShadow: isActive ? `0 4px 12px ${category.color}40` : undefined,
+            }}
           >
-            <span style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ display: 'flex', alignItems: 'center', color: isActive ? '#ffffff' : category.color }}>
               {getIcon(category.iconName)}
             </span>
             <span>{category.label}</span>
@@ -68,7 +81,7 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
                 fontSize: '11px',
                 padding: '2px 6px',
                 borderRadius: '999px',
-                backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#e2e8f0',
+                backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#f1f5f9',
                 color: isActive ? '#ffffff' : '#475569',
                 marginLeft: '2px',
                 fontWeight: 600,

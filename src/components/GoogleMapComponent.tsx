@@ -105,13 +105,18 @@ function RouteRenderer({ directionsResponse }: { directionsResponse: google.maps
 
 const CATEGORY_COLORS: Record<CategoryId, { background: string; borderColor: string; glyphColor: string }> = {
   all: { background: '#3B82F6', borderColor: '#1D4ED8', glyphColor: '#FFFFFF' },
-  narita_special: { background: '#EC4899', borderColor: '#BE185D', glyphColor: '#FFFFFF' },
-  restaurant: { background: '#EF4444', borderColor: '#B91C1C', glyphColor: '#FFFFFF' },
+  my_stay: { background: '#16A34A', borderColor: '#15803D', glyphColor: '#FFFFFF' },
+  sushi: { background: '#0EA5E9', borderColor: '#0284C7', glyphColor: '#FFFFFF' },
+  ramen: { background: '#EF4444', borderColor: '#B91C1C', glyphColor: '#FFFFFF' },
+  meat: { background: '#F97316', borderColor: '#C2410C', glyphColor: '#FFFFFF' },
+  izakaya: { background: '#A855F7', borderColor: '#7E22CE', glyphColor: '#FFFFFF' },
   cafe: { background: '#F59E0B', borderColor: '#D97706', glyphColor: '#FFFFFF' },
   attraction: { background: '#8B5CF6', borderColor: '#6D28D9', glyphColor: '#FFFFFF' },
   shopping: { background: '#10B981', borderColor: '#047857', glyphColor: '#FFFFFF' },
+  narita_special: { background: '#EC4899', borderColor: '#BE185D', glyphColor: '#FFFFFF' },
   transit: { background: '#06B6D4', borderColor: '#0E7490', glyphColor: '#FFFFFF' },
-  stay: { background: '#6366F1', borderColor: '#4338CA', glyphColor: '#FFFFFF' },
+  stay: { background: '#16A34A', borderColor: '#15803D', glyphColor: '#FFFFFF' },
+  restaurant: { background: '#EF4444', borderColor: '#B91C1C', glyphColor: '#FFFFFF' },
 };
 
 export const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({

@@ -14,13 +14,18 @@ L.Icon.Default.mergeOptions({
 // Category color and icon map
 const CATEGORY_STYLES: Record<CategoryId, { bg: string; icon: string }> = {
   all: { bg: '#3B82F6', icon: '📍' },
-  narita_special: { bg: '#EC4899', icon: '✈️' },
-  restaurant: { bg: '#EF4444', icon: '🍜' },
+  my_stay: { bg: '#16A34A', icon: '🏨' },
+  sushi: { bg: '#0EA5E9', icon: '🍣' },
+  ramen: { bg: '#EF4444', icon: '🍜' },
+  meat: { bg: '#F97316', icon: '🥩' },
+  izakaya: { bg: '#A855F7', icon: '🍢' },
   cafe: { bg: '#F59E0B', icon: '☕' },
   attraction: { bg: '#8B5CF6', icon: '🗼' },
   shopping: { bg: '#10B981', icon: '🛍️' },
+  narita_special: { bg: '#EC4899', icon: '✈️' },
   transit: { bg: '#06B6D4', icon: '🚆' },
-  stay: { bg: '#6366F1', icon: '🏨' },
+  stay: { bg: '#16A34A', icon: '🏨' },
+  restaurant: { bg: '#EF4444', icon: '🍜' },
 };
 
 function createCustomPin(category: CategoryId, isSelected: boolean) {
