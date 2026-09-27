@@ -22,6 +22,28 @@ export const REGIONS: RegionInfo[] = [
 export const PLACES_DATA: Place[] = [
   // --- 나리타 지역 ---
   {
+    id: 'narita-welco-hotel',
+    name: '🏨 [내 숙소] 호텔 웰코 나리타',
+    nameJa: 'ホテルウェルコ成田',
+    nameEn: 'Hotel Welco Narita',
+    category: 'stay',
+    region: 'narita',
+    lat: 35.7766,
+    lng: 140.3155,
+    rating: 4.2,
+    reviewCount: 2840,
+    address: '지바현 나리타시 하나자키초 818-1',
+    addressJa: '千葉県成田市花崎町818-1',
+    description: '게이세이 나리타역 동쪽 출구 바로 앞 도보 1분(JR 나리타역 도보 1분) 초역세권 숙소! 나리타 공항까지 전철로 8분 만에 이동 가능하며, 공항 무료 셔틀버스와 나리타산 오모테산도 상점가 산책이 편리한 여행 베이스캠프입니다.',
+    highlights: ['게이세이 나리타역 도보 1분 초역세권', '나리타 공항 전철 8분 직통 & 무료 셔틀버스 운행', '나리타산 오모테산도 장어거리 도보 5분', '호텔 바로 옆 편의점(세븐일레븐/로손) 완비'],
+    imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80',
+    priceLevel: '₩₩',
+    businessHours: '24시간 프런트 데스크 운영 (체크인 15:00 / 체크아웃 11:00)',
+    transitTip: '게이세이 나리타역 도보 1분 / 나리타공항에서 전철 8분 직통',
+    tags: ['내숙소', '호텔웰코나리타', '나리타호텔', '초역세권', '공항셔틀', '베이스캠프'],
+    googleMapsUrl: 'https://maps.google.com/?q=Hotel+Welco+Narita'
+  },
+  {
     id: 'narita-1',
     name: '카와토요 본점 (우나기 장어덮밥)',
     nameJa: '川豊 本店',

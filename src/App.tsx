@@ -81,17 +81,25 @@ export function App() {
   };
 
   const handleOpenDirections = (place?: Place) => {
-    const targetPlace = place || places[0];
+    const targetPlace = place || places[1] || places[0]; // Default to first place or restaurant
     setDirectionsDestPlace(targetPlace);
     setIsDirectionsOpen(true);
     setDirectionsError(null);
 
-    // If destination provided, automatically trigger default route from Narita Airport T1
-    const defaultOrigin = {
-      name: '✈️ 나리타공항 제1터미널',
-      lat: 35.7652,
-      lng: 140.3863,
-    };
+    // If destination is Hotel Welco itself, origin is Narita Airport. Otherwise, origin is Hotel Welco!
+    const isDestWelco = targetPlace.id === 'narita-welco-hotel';
+    const defaultOrigin = isDestWelco
+      ? {
+          name: '✈️ 나리타공항 제1터미널',
+          lat: 35.7652,
+          lng: 140.3863,
+        }
+      : {
+          name: '🏨 [내 숙소] 호텔 웰코 나리타',
+          lat: 35.7766,
+          lng: 140.3155,
+        };
+
     const destPoint = {
       name: targetPlace.name,
       lat: targetPlace.lat,

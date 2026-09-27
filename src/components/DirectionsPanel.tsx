@@ -214,6 +214,68 @@ export const DirectionsPanel: React.FC<DirectionsPanelProps> = ({
         </button>
       </div>
 
+      {/* Hotel Welco Narita Quick Actions */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          padding: '8px 16px',
+          backgroundColor: '#f0fdf4',
+          borderBottom: '1px solid #dcfce7',
+        }}
+      >
+        <button
+          onClick={() => setSelectedOriginIndex(0)}
+          style={{
+            flex: 1,
+            padding: '6px 10px',
+            borderRadius: '8px',
+            backgroundColor: selectedOriginIndex === 0 ? '#16a34a' : '#ffffff',
+            color: selectedOriginIndex === 0 ? '#ffffff' : '#15803d',
+            border: '1px solid #86efac',
+            fontSize: '11.5px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            transition: 'all 0.15s ease',
+          }}
+          title="출발지를 호텔 웰코 나리타(내 숙소)로 설정"
+        >
+          <span>🏨</span>
+          <span>숙소에서 출발</span>
+        </button>
+
+        <button
+          onClick={() => {
+            const welco = places.find((p) => p.id === 'narita-welco-hotel');
+            if (welco) setSelectedDestId(welco.id);
+          }}
+          style={{
+            flex: 1,
+            padding: '6px 10px',
+            borderRadius: '8px',
+            backgroundColor: selectedDestId === 'narita-welco-hotel' ? '#16a34a' : '#ffffff',
+            color: selectedDestId === 'narita-welco-hotel' ? '#ffffff' : '#15803d',
+            border: '1px solid #86efac',
+            fontSize: '11.5px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            transition: 'all 0.15s ease',
+          }}
+          title="도착지를 호텔 웰코 나리타(내 숙소)로 설정"
+        >
+          <span>🏠</span>
+          <span>숙소로 돌아가기</span>
+        </button>
+      </div>
+
       {/* Origin & Destination Inputs */}
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

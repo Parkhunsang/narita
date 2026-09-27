@@ -33,6 +33,7 @@ export interface LocationPoint {
 }
 
 export const PRESET_ORIGINS: LocationPoint[] = [
+  { name: '🏨 [내 숙소] 호텔 웰코 나리타 (Hotel Welco Narita)', lat: 35.7766, lng: 140.3155 },
   { name: '✈️ 나리타공항 제1터미널', lat: 35.7652, lng: 140.3863 },
   { name: '✈️ 나리타공항 제2·3터미널', lat: 35.7725, lng: 140.3875 },
   { name: '🚆 게이세이 우에노역', lat: 35.7119, lng: 139.7744 },
