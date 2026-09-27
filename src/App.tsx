@@ -12,6 +12,7 @@ import { TransitModal } from './components/TransitModal';
 import { QuotaAlertModal } from './components/QuotaAlertModal';
 import { MapSettingsModal } from './components/MapSettingsModal';
 import { DirectionsPanel } from './components/DirectionsPanel';
+import { CurrencyModal } from './components/CurrencyModal';
 import type { LocationPoint, TravelMode, RouteResult } from './types/directions';
 import { fetchGoogleDirections } from './utils/directionsService';
 import { Plane, Compass, Navigation, Layers, ShieldCheck } from 'lucide-react';
@@ -26,6 +27,7 @@ export function App() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [detailPlace, setDetailPlace] = useState<Place | null>(null);
   const [isTransitModalOpen, setIsTransitModalOpen] = useState(false);
+  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
   const [isSavedOnly, setIsSavedOnly] = useState(false);
 
   // Read API Key strictly from environment variable, NEVER expose in UI
@@ -261,6 +263,7 @@ export function App() {
           onSearchChange={setSearchQuery}
           onOpenTransitModal={() => setIsTransitModalOpen(true)}
           onOpenDirections={() => handleOpenDirections()}
+          onOpenCurrencyModal={() => setIsCurrencyModalOpen(true)}
           onToggleSavedOnly={() => setIsSavedOnly(!isSavedOnly)}
           isSavedOnly={isSavedOnly}
           savedCount={savedPlaceIds.length}
@@ -423,6 +426,12 @@ export function App() {
       <TransitModal
         isOpen={isTransitModalOpen}
         onClose={() => setIsTransitModalOpen(false)}
+      />
+
+      {/* Real-time JPY Currency Converter & Tax-free / Split bill Modal */}
+      <CurrencyModal
+        isOpen={isCurrencyModalOpen}
+        onClose={() => setIsCurrencyModalOpen(false)}
       />
 
       {/* Quota & Billing Safeguard Alert Modal */}

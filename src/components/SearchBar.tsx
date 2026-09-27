@@ -1,11 +1,12 @@
 import React from 'react';
-import { Search, X, Train, Bookmark, Navigation } from 'lucide-react';
+import { Search, X, Train, Bookmark, Navigation, Coins } from 'lucide-react';
 
 interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onOpenTransitModal: () => void;
   onOpenDirections: () => void;
+  onOpenCurrencyModal: () => void;
   onToggleSavedOnly: () => void;
   isSavedOnly: boolean;
   savedCount: number;
@@ -16,6 +17,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onSearchChange,
   onOpenTransitModal,
   onOpenDirections,
+  onOpenCurrencyModal,
   onToggleSavedOnly,
   isSavedOnly,
   savedCount,
@@ -127,6 +129,32 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       >
         <Train size={16} color="#38bdf8" />
         <span className="hide-on-very-small">공항교통</span>
+      </button>
+
+      {/* Currency Exchange Calculator Button */}
+      <button
+        onClick={onOpenCurrencyModal}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '10px 14px',
+          backgroundColor: '#f59e0b',
+          color: '#ffffff',
+          borderRadius: '999px',
+          border: 'none',
+          fontSize: '13px',
+          fontWeight: 700,
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+          transition: 'all 0.2s ease',
+          flexShrink: 0,
+        }}
+        title="실시간 엔화(JPY) 환율 계산기 및 면세/더치페이 계산"
+      >
+        <Coins size={15} />
+        <span className="hide-on-very-small">환율계산</span>
       </button>
 
       {/* Saved Places Toggle Button */}
