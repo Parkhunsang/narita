@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import type { Place } from '../types/place';
-import { X, Star, Clock, MapPin, Copy, Check, ExternalLink, Bookmark, Sparkles } from 'lucide-react';
+import { X, Star, Clock, MapPin, Copy, Check, ExternalLink, Bookmark, Sparkles, Navigation } from 'lucide-react';
 
 interface PlaceDetailModalProps {
   place: Place | null;
   isSaved: boolean;
   onClose: () => void;
   onToggleSave: () => void;
+  onOpenDirections?: (place: Place) => void;
 }
 
 export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
@@ -14,6 +15,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
   isSaved,
   onClose,
   onToggleSave,
+  onOpenDirections,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -276,39 +278,65 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Footer with Google Maps Link */}
+        {/* Footer with Directions & External Link */}
         <div
           style={{
             padding: '16px 24px',
             borderTop: '1px solid #f1f5f9',
             backgroundColor: '#ffffff',
             display: 'flex',
-            gap: '12px',
+            gap: '10px',
           }}
         >
+          {onOpenDirections && (
+            <button
+              onClick={() => {
+                onClose();
+                onOpenDirections(place);
+              }}
+              style={{
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 0',
+                borderRadius: '12px',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
+              }}
+            >
+              <Navigation size={16} />
+              이 장소까지 길찾기
+            </button>
+          )}
+
           <a
             href={place.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              flex: 1,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
-              padding: '12px 0',
+              gap: '6px',
+              padding: '12px 18px',
               borderRadius: '12px',
-              backgroundColor: '#2563eb',
-              color: '#ffffff',
+              backgroundColor: '#f8fafc',
+              border: '1px solid #cbd5e1',
+              color: '#334155',
               textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: 700,
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
-              transition: 'background 0.15s ease',
+              fontSize: '13px',
+              fontWeight: 600,
             }}
           >
-            <ExternalLink size={16} />
-            구글 지도에서 실시간 길찾기
+            <ExternalLink size={15} />
+            구글맵 앱
           </a>
         </div>
       </div>

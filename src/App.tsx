@@ -11,6 +11,9 @@ import { PlaceDetailModal } from './components/PlaceDetailModal';
 import { TransitModal } from './components/TransitModal';
 import { QuotaAlertModal } from './components/QuotaAlertModal';
 import { MapSettingsModal } from './components/MapSettingsModal';
+import { DirectionsPanel } from './components/DirectionsPanel';
+import type { LocationPoint, TravelMode, RouteResult } from './types/directions';
+import { fetchGoogleDirections } from './utils/directionsService';
 import { Plane, Compass, Navigation, Layers, ShieldCheck } from 'lucide-react';
 
 const SAVED_STORAGE_KEY = 'tokyo_narita_saved_places_v1';
@@ -37,6 +40,14 @@ export function App() {
     isOpen: false,
     message: '',
   });
+
+  // Directions state
+  const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+  const [directionsDestPlace, setDirectionsDestPlace] = useState<Place | null>(null);
+  const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
+  const [routeResult, setRouteResult] = useState<RouteResult | null>(null);
+  const [isDirectionsLoading, setIsDirectionsLoading] = useState(false);
+  const [directionsError, setDirectionsError] = useState<string | null>(null);
 
   // Saved bookmarks persistence
   const [savedPlaceIds, setSavedPlaceIds] = useState<string[]>(() => {
@@ -67,6 +78,77 @@ export function App() {
       isOpen: true,
       message: errorMsg,
     });
+  };
+
+  const handleOpenDirections = (place?: Place) => {
+    const targetPlace = place || places[0];
+    setDirectionsDestPlace(targetPlace);
+    setIsDirectionsOpen(true);
+    setDirectionsError(null);
+
+    // If destination provided, automatically trigger default route from Narita Airport T1
+    const defaultOrigin = {
+      name: '✈️ 나리타공항 제1터미널',
+      lat: 35.7652,
+      lng: 140.3863,
+    };
+    const destPoint = {
+      name: targetPlace.name,
+      lat: targetPlace.lat,
+      lng: targetPlace.lng,
+    };
+
+    handleRequestRoute(defaultOrigin, destPoint, 'TRANSIT');
+  };
+
+  const handleRequestRoute = async (
+    origin: LocationPoint,
+    destination: LocationPoint,
+    mode: TravelMode
+  ) => {
+    setIsDirectionsLoading(true);
+    setDirectionsError(null);
+
+    try {
+      const google = (window as any).google;
+      if (google?.maps?.DirectionsService) {
+        const directionsService = new google.maps.DirectionsService();
+        const googleTravelMode =
+          mode === 'TRANSIT'
+            ? google.maps.TravelMode.TRANSIT
+            : mode === 'WALKING'
+            ? google.maps.TravelMode.WALKING
+            : google.maps.TravelMode.DRIVING;
+
+        directionsService.route(
+          {
+            origin: { lat: origin.lat, lng: origin.lng },
+            destination: { lat: destination.lat, lng: destination.lng },
+            travelMode: googleTravelMode,
+          },
+          (result: any, status: string) => {
+            if (status === 'OK' && result) {
+              setDirectionsResponse(result);
+            } else {
+              setDirectionsResponse(null);
+            }
+          }
+        );
+      }
+
+      const res = await fetchGoogleDirections(origin, destination, mode);
+      setRouteResult(res);
+      setIsDirectionsLoading(false);
+    } catch (err: any) {
+      setIsDirectionsLoading(false);
+      setDirectionsError(err.message || '경로를 계산하지 못했습니다.');
+    }
+  };
+
+  const handleClearRoute = () => {
+    setDirectionsResponse(null);
+    setRouteResult(null);
+    setDirectionsError(null);
   };
 
   // Determine current map center & zoom based on selected region
@@ -163,6 +245,7 @@ export function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onOpenTransitModal={() => setIsTransitModalOpen(true)}
+          onOpenDirections={() => handleOpenDirections()}
           onToggleSavedOnly={() => setIsSavedOnly(!isSavedOnly)}
           isSavedOnly={isSavedOnly}
           savedCount={savedPlaceIds.length}
@@ -195,6 +278,20 @@ export function App() {
         onSelectPlace={handleSelectPlace}
         onToggleSave={toggleSavePlace}
         onOpenDetails={handleOpenDetails}
+        onOpenDirections={(p) => handleOpenDirections(p)}
+      />
+
+      {/* Directions Panel */}
+      <DirectionsPanel
+        isOpen={isDirectionsOpen}
+        places={places}
+        destinationPlace={directionsDestPlace}
+        onClose={() => setIsDirectionsOpen(false)}
+        onRequestRoute={handleRequestRoute}
+        routeResult={routeResult}
+        isLoading={isDirectionsLoading}
+        errorMessage={directionsError}
+        onClearRoute={handleClearRoute}
       />
 
       {/* Main Map View (Google Maps or Leaflet Fallback) */}
@@ -210,6 +307,7 @@ export function App() {
             }}
             center={currentCenter}
             zoom={currentZoom}
+            directionsResponse={directionsResponse}
             onQuotaOrAuthError={handleQuotaError}
           />
         ) : (
@@ -303,6 +401,7 @@ export function App() {
         isSaved={detailPlace ? savedPlaceIds.includes(detailPlace.id) : false}
         onClose={() => setDetailPlace(null)}
         onToggleSave={() => detailPlace && toggleSavePlace(detailPlace.id)}
+        onOpenDirections={(p) => handleOpenDirections(p)}
       />
 
       {/* Narita ↔ Tokyo Transit Comparison Modal */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Place } from '../types/place';
-import { Star, Clock, Bookmark, ExternalLink } from 'lucide-react';
+import { Star, Clock, Bookmark, ExternalLink, Navigation } from 'lucide-react';
 
 interface PlaceCardProps {
   place: Place;
@@ -9,6 +9,7 @@ interface PlaceCardProps {
   onSelect: () => void;
   onToggleSave: () => void;
   onOpenDetails: () => void;
+  onOpenDirections?: (place: Place) => void;
 }
 
 export const PlaceCard: React.FC<PlaceCardProps> = ({
@@ -18,6 +19,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
   onSelect,
   onToggleSave,
   onOpenDetails,
+  onOpenDirections,
 }) => {
   return (
     <div
@@ -202,7 +204,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
         </div>
 
         {/* Card Action Buttons */}
-        <div style={{ display: 'flex', gap: '8px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+        <div style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -223,6 +225,35 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
           >
             상세 보기
           </button>
+
+          {onOpenDirections && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDirections(place);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                padding: '7px 10px',
+                borderRadius: '8px',
+                backgroundColor: '#eff6ff',
+                color: '#2563eb',
+                border: '1px solid #bfdbfe',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'background 0.15s ease',
+              }}
+              title="이 장소까지 길찾기"
+            >
+              <Navigation size={12} />
+              길찾기
+            </button>
+          )}
+
           <a
             href={place.googleMapsUrl}
             target="_blank"
@@ -233,19 +264,19 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '4px',
-              padding: '7px 12px',
+              padding: '7px 10px',
               borderRadius: '8px',
-              backgroundColor: '#eff6ff',
-              color: '#2563eb',
+              backgroundColor: '#ffffff',
+              color: '#64748b',
               textDecoration: 'none',
               fontSize: '12px',
               fontWeight: 600,
-              border: '1px solid #bfdbfe',
+              border: '1px solid #e2e8f0',
               transition: 'background 0.15s ease',
             }}
+            title="구글 지도 바로가기"
           >
             <ExternalLink size={12} />
-            구글맵
           </a>
         </div>
       </div>

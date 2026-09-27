@@ -11,6 +11,7 @@ interface SidebarProps {
   onSelectPlace: (place: Place) => void;
   onToggleSave: (placeId: string) => void;
   onOpenDetails: (place: Place) => void;
+  onOpenDirections?: (place: Place) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -21,6 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectPlace,
   onToggleSave,
   onOpenDetails,
+  onOpenDirections,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -167,6 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onSelect={() => onSelectPlace(place)}
                 onToggleSave={() => onToggleSave(place.id)}
                 onOpenDetails={() => onOpenDetails(place)}
+                onOpenDirections={onOpenDirections}
               />
             ))
           )}

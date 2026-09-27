@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useMap } from '@vis.gl/react-google-maps';
+import { 
+  APIProvider, 
+  Map, 
+  AdvancedMarker, 
+  Pin, 
+  InfoWindow, 
+  useMap,
+  useMapsLibrary
+} from '@vis.gl/react-google-maps';
 import type { Place, CategoryId } from '../types/place';
 
 interface GoogleMapComponentProps {
@@ -9,6 +17,7 @@ interface GoogleMapComponentProps {
   onSelectPlace: (place: Place | null) => void;
   center: [number, number];
   zoom: number;
+  directionsResponse: google.maps.DirectionsResult | null;
   onQuotaOrAuthError: (errorMessage: string) => void;
 }
 
@@ -17,15 +26,17 @@ function GoogleMapController({
   center,
   zoom,
   selectedPlace,
+  hasDirections,
 }: {
   center: [number, number];
   zoom: number;
   selectedPlace: Place | null;
+  hasDirections: boolean;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || hasDirections) return;
 
     if (selectedPlace) {
       map.panTo({ lat: selectedPlace.lat, lng: selectedPlace.lng });
@@ -34,7 +45,7 @@ function GoogleMapController({
       map.panTo({ lat: center[0], lng: center[1] });
       map.setZoom(zoom);
     }
-  }, [map, center, zoom, selectedPlace]);
+  }, [map, center, zoom, selectedPlace, hasDirections]);
 
   // Enable Transit Layer (도쿄 지하철/철도 노선)
   useEffect(() => {
@@ -46,6 +57,48 @@ function GoogleMapController({
       transitLayer.setMap(null);
     };
   }, [map]);
+
+  return null;
+}
+
+// Subcomponent to render Directions polyline on Google Map
+function RouteRenderer({ directionsResponse }: { directionsResponse: google.maps.DirectionsResult | null }) {
+  const map = useMap();
+  const routesLib = useMapsLibrary('routes');
+  const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
+
+  useEffect(() => {
+    if (!routesLib || !map) return;
+
+    const renderer = new routesLib.DirectionsRenderer({
+      map,
+      suppressMarkers: false,
+      polylineOptions: {
+        strokeColor: '#2563eb',
+        strokeWeight: 6,
+        strokeOpacity: 0.85,
+      },
+    });
+
+    setDirectionsRenderer(renderer);
+
+    return () => {
+      renderer.setMap(null);
+    };
+  }, [routesLib, map]);
+
+  useEffect(() => {
+    if (!directionsRenderer) return;
+
+    directionsRenderer.setDirections(directionsResponse);
+
+    if (directionsResponse && map) {
+      const bounds = directionsResponse.routes[0]?.bounds;
+      if (bounds) {
+        map.fitBounds(bounds, 60);
+      }
+    }
+  }, [directionsRenderer, directionsResponse, map]);
 
   return null;
 }
@@ -68,6 +121,7 @@ export const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   onSelectPlace,
   center,
   zoom,
+  directionsResponse,
   onQuotaOrAuthError,
 }) => {
   const [infoWindowPlace, setInfoWindowPlace] = useState<Place | null>(null);
@@ -91,14 +145,7 @@ export const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   }, [selectedPlace]);
 
   return (
-    <APIProvider
-      apiKey={apiKey}
-      onLoad={() => {
-        // Track local usage
-        const currentCount = parseInt(localStorage.getItem('google_maps_load_count') || '0', 10);
-        localStorage.setItem('google_maps_load_count', (currentCount + 1).toString());
-      }}
-    >
+    <APIProvider apiKey={apiKey} libraries={['routes']}>
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         <Map
           defaultCenter={{ lat: center[0], lng: center[1] }}
@@ -108,8 +155,16 @@ export const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
           disableDefaultUI={false}
           style={{ width: '100%', height: '100%' }}
         >
-          <GoogleMapController center={center} zoom={zoom} selectedPlace={selectedPlace} />
+          <GoogleMapController 
+            center={center} 
+            zoom={zoom} 
+            selectedPlace={selectedPlace} 
+            hasDirections={Boolean(directionsResponse)}
+          />
 
+          <RouteRenderer directionsResponse={directionsResponse} />
+
+          {/* Markers */}
           {places.map((place) => {
             const isSelected = selectedPlace?.id === place.id;
             const colors = CATEGORY_COLORS[place.category] || CATEGORY_COLORS.all;
@@ -134,7 +189,7 @@ export const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
             );
           })}
 
-          {infoWindowPlace && (
+          {infoWindowPlace && !directionsResponse && (
             <InfoWindow
               position={{ lat: infoWindowPlace.lat, lng: infoWindowPlace.lng }}
               onCloseClick={() => setInfoWindowPlace(null)}

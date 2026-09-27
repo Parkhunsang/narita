@@ -1,10 +1,11 @@
 import React from 'react';
-import { Search, X, Train, Bookmark } from 'lucide-react';
+import { Search, X, Train, Bookmark, Navigation } from 'lucide-react';
 
 interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onOpenTransitModal: () => void;
+  onOpenDirections: () => void;
   onToggleSavedOnly: () => void;
   isSavedOnly: boolean;
   savedCount: number;
@@ -14,6 +15,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   searchQuery,
   onSearchChange,
   onOpenTransitModal,
+  onOpenDirections,
   onToggleSavedOnly,
   isSavedOnly,
   savedCount,
@@ -74,6 +76,32 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </button>
         )}
       </div>
+
+      {/* Directions Quick Button */}
+      <button
+        onClick={onOpenDirections}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '10px 14px',
+          backgroundColor: '#2563eb',
+          color: '#ffffff',
+          borderRadius: '999px',
+          border: 'none',
+          fontSize: '13px',
+          fontWeight: 700,
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+          transition: 'all 0.2s ease',
+          flexShrink: 0,
+        }}
+        title="실시간 대중교통 길찾기 (나리타공항 ↔ 숙소)"
+      >
+        <Navigation size={15} />
+        <span className="hide-on-very-small">길찾기</span>
+      </button>
 
       {/* Transit Guide Quick Button */}
       <button
