@@ -2,15 +2,19 @@ import { useState, useEffect, useMemo } from 'react';
 import { PLACES_DATA, REGIONS } from './data/placesData';
 import type { Place, CategoryId, RegionId } from './types/place';
 import { MapComponent } from './components/MapComponent';
+import { GoogleMapComponent } from './components/GoogleMapComponent';
 import { SearchBar } from './components/SearchBar';
 import { CategoryChips } from './components/CategoryChips';
 import { RegionSelector } from './components/RegionSelector';
 import { Sidebar } from './components/Sidebar';
 import { PlaceDetailModal } from './components/PlaceDetailModal';
 import { TransitModal } from './components/TransitModal';
-import { Plane, Compass, Navigation } from 'lucide-react';
+import { QuotaAlertModal } from './components/QuotaAlertModal';
+import { ApiKeyModal } from './components/ApiKeyModal';
+import { Plane, Compass, Navigation, Layers, ShieldCheck } from 'lucide-react';
 
 const SAVED_STORAGE_KEY = 'tokyo_narita_saved_places_v1';
+const API_KEY_STORAGE_KEY = 'tokyo_narita_google_maps_api_key';
 
 export function App() {
   const [places] = useState<Place[]>(PLACES_DATA);
@@ -21,6 +25,22 @@ export function App() {
   const [detailPlace, setDetailPlace] = useState<Place | null>(null);
   const [isTransitModalOpen, setIsTransitModalOpen] = useState(false);
   const [isSavedOnly, setIsSavedOnly] = useState(false);
+
+  // Map Provider state: 'google' | 'leaflet'
+  const [googleApiKey, setGoogleApiKey] = useState<string>(() => {
+    return localStorage.getItem(API_KEY_STORAGE_KEY) || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  });
+  const [mapProvider, setMapProvider] = useState<'google' | 'leaflet'>(() => {
+    const key = localStorage.getItem(API_KEY_STORAGE_KEY) || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+    return key ? 'google' : 'leaflet';
+  });
+
+  // Modals for API Key & Quota Alert
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [quotaAlertInfo, setQuotaAlertInfo] = useState<{ isOpen: boolean; message: string }>({
+    isOpen: false,
+    message: '',
+  });
 
   // Saved bookmarks persistence
   const [savedPlaceIds, setSavedPlaceIds] = useState<string[]>(() => {
@@ -46,6 +66,23 @@ export function App() {
     );
   };
 
+  const handleSaveApiKey = (newKey: string) => {
+    setGoogleApiKey(newKey);
+    localStorage.setItem(API_KEY_STORAGE_KEY, newKey);
+    if (newKey) {
+      setMapProvider('google');
+    } else {
+      setMapProvider('leaflet');
+    }
+  };
+
+  const handleQuotaError = (errorMsg: string) => {
+    setQuotaAlertInfo({
+      isOpen: true,
+      message: errorMsg,
+    });
+  };
+
   // Determine current map center & zoom based on selected region
   const { currentCenter, currentZoom } = useMemo(() => {
     const regionObj = REGIONS.find((r) => r.id === selectedRegion) || REGIONS[0];
@@ -68,7 +105,6 @@ export function App() {
       // 2. Category filter
       if (selectedCategory !== 'all') {
         if (selectedCategory === 'narita_special') {
-          // Narita special category
           if (place.category !== 'narita_special' && place.region !== 'narita') {
             return false;
           }
@@ -135,7 +171,7 @@ export function App() {
 
   return (
     <div className="app-container">
-      {/* Top Floating Bar (Search, Category Chips, and Region Quick Jumps) */}
+      {/* Top Floating Bar */}
       <div className="top-nav-layer">
         <SearchBar
           searchQuery={searchQuery}
@@ -175,18 +211,70 @@ export function App() {
         onOpenDetails={handleOpenDetails}
       />
 
-      {/* Main Map View */}
+      {/* Main Map View (Google Maps or Leaflet Fallback) */}
       <div style={{ flex: 1, height: '100%', position: 'relative' }}>
-        <MapComponent
-          places={filteredPlaces}
-          selectedPlace={selectedPlace}
-          onSelectPlace={(p) => {
-            setSelectedPlace(p);
-            if (p) setDetailPlace(p);
+        {mapProvider === 'google' && googleApiKey ? (
+          <GoogleMapComponent
+            apiKey={googleApiKey}
+            places={filteredPlaces}
+            selectedPlace={selectedPlace}
+            onSelectPlace={(p) => {
+              setSelectedPlace(p);
+              if (p) setDetailPlace(p);
+            }}
+            center={currentCenter}
+            zoom={currentZoom}
+            onQuotaOrAuthError={handleQuotaError}
+          />
+        ) : (
+          <MapComponent
+            places={filteredPlaces}
+            selectedPlace={selectedPlace}
+            onSelectPlace={(p) => {
+              setSelectedPlace(p);
+              if (p) setDetailPlace(p);
+            }}
+            center={currentCenter}
+            zoom={currentZoom}
+          />
+        )}
+
+        {/* Map Engine Switcher & Safe Indicator Badge */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
-          center={currentCenter}
-          zoom={currentZoom}
-        />
+        >
+          <button
+            onClick={() => setIsApiKeyModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 12px',
+              borderRadius: '999px',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid #cbd5e1',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+              fontSize: '12px',
+              fontWeight: 700,
+              color: mapProvider === 'google' ? '#1d4ed8' : '#0f172a',
+              cursor: 'pointer',
+            }}
+            title="지도 엔진 설정 및 과금 방지 안내"
+          >
+            <Layers size={14} color={mapProvider === 'google' ? '#2563eb' : '#64748b'} />
+            <span>{mapProvider === 'google' ? 'Google Maps 연동' : 'OpenStreetMap (무료)'}</span>
+            <ShieldCheck size={13} color="#16a34a" />
+          </button>
+        </div>
 
         {/* Floating Quick Navigation buttons on the map */}
         <div className="map-floating-actions">
@@ -223,7 +311,7 @@ export function App() {
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* Place Detail Modal */}
       <PlaceDetailModal
         place={detailPlace}
         isSaved={detailPlace ? savedPlaceIds.includes(detailPlace.id) : false}
@@ -235,6 +323,22 @@ export function App() {
       <TransitModal
         isOpen={isTransitModalOpen}
         onClose={() => setIsTransitModalOpen(false)}
+      />
+
+      {/* Quota & Billing Safeguard Alert Modal */}
+      <QuotaAlertModal
+        isOpen={quotaAlertInfo.isOpen}
+        errorMessage={quotaAlertInfo.message}
+        onClose={() => setQuotaAlertInfo({ isOpen: false, message: '' })}
+        onSwitchToFallback={() => setMapProvider('leaflet')}
+      />
+
+      {/* API Key Settings Modal */}
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        currentApiKey={googleApiKey}
+        onClose={() => setIsApiKeyModalOpen(false)}
+        onSaveApiKey={handleSaveApiKey}
       />
     </div>
   );
