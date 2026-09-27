@@ -10,11 +10,10 @@ import { Sidebar } from './components/Sidebar';
 import { PlaceDetailModal } from './components/PlaceDetailModal';
 import { TransitModal } from './components/TransitModal';
 import { QuotaAlertModal } from './components/QuotaAlertModal';
-import { ApiKeyModal } from './components/ApiKeyModal';
+import { MapSettingsModal } from './components/MapSettingsModal';
 import { Plane, Compass, Navigation, Layers, ShieldCheck } from 'lucide-react';
 
 const SAVED_STORAGE_KEY = 'tokyo_narita_saved_places_v1';
-const API_KEY_STORAGE_KEY = 'tokyo_narita_google_maps_api_key';
 
 export function App() {
   const [places] = useState<Place[]>(PLACES_DATA);
@@ -26,17 +25,14 @@ export function App() {
   const [isTransitModalOpen, setIsTransitModalOpen] = useState(false);
   const [isSavedOnly, setIsSavedOnly] = useState(false);
 
-  // Map Provider state: 'google' | 'leaflet'
-  const [googleApiKey, setGoogleApiKey] = useState<string>(() => {
-    return localStorage.getItem(API_KEY_STORAGE_KEY) || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-  });
+  // Read API Key strictly from environment variable, NEVER expose in UI
+  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
   const [mapProvider, setMapProvider] = useState<'google' | 'leaflet'>(() => {
-    const key = localStorage.getItem(API_KEY_STORAGE_KEY) || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-    return key ? 'google' : 'leaflet';
+    return googleApiKey ? 'google' : 'leaflet';
   });
 
-  // Modals for API Key & Quota Alert
-  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  // Settings modal
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [quotaAlertInfo, setQuotaAlertInfo] = useState<{ isOpen: boolean; message: string }>({
     isOpen: false,
     message: '',
@@ -64,16 +60,6 @@ export function App() {
     setSavedPlaceIds((prev) =>
       prev.includes(placeId) ? prev.filter((id) => id !== placeId) : [...prev, placeId]
     );
-  };
-
-  const handleSaveApiKey = (newKey: string) => {
-    setGoogleApiKey(newKey);
-    localStorage.setItem(API_KEY_STORAGE_KEY, newKey);
-    if (newKey) {
-      setMapProvider('google');
-    } else {
-      setMapProvider('leaflet');
-    }
   };
 
   const handleQuotaError = (errorMsg: string) => {
@@ -252,7 +238,7 @@ export function App() {
           }}
         >
           <button
-            onClick={() => setIsApiKeyModalOpen(true)}
+            onClick={() => setIsSettingsModalOpen(true)}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -268,7 +254,7 @@ export function App() {
               color: mapProvider === 'google' ? '#1d4ed8' : '#0f172a',
               cursor: 'pointer',
             }}
-            title="지도 엔진 설정 및 과금 방지 안내"
+            title="지도 엔진 설정"
           >
             <Layers size={14} color={mapProvider === 'google' ? '#2563eb' : '#64748b'} />
             <span>{mapProvider === 'google' ? 'Google Maps 연동' : 'OpenStreetMap (무료)'}</span>
@@ -333,12 +319,13 @@ export function App() {
         onSwitchToFallback={() => setMapProvider('leaflet')}
       />
 
-      {/* API Key Settings Modal */}
-      <ApiKeyModal
-        isOpen={isApiKeyModalOpen}
-        currentApiKey={googleApiKey}
-        onClose={() => setIsApiKeyModalOpen(false)}
-        onSaveApiKey={handleSaveApiKey}
+      {/* Map Engine Settings Modal (No raw API key displayed) */}
+      <MapSettingsModal
+        isOpen={isSettingsModalOpen}
+        mapProvider={mapProvider}
+        hasApiKey={Boolean(googleApiKey)}
+        onClose={() => setIsSettingsModalOpen(false)}
+        onToggleProvider={(provider) => setMapProvider(provider)}
       />
     </div>
   );
